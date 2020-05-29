@@ -23,18 +23,15 @@ class AsklistSpider(scrapy.Spider):
     follows_query = "data%5B*%5D.answer_count%2Carticles_count%2Cgender%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F(type%3Dbest_answerer)%5D.topics"
 
     # followers_url是获取粉丝列表信息的url地址，followers_query存储的为查询参数。
-    followers_url = "https://www.zhihu.com/api/v4/members/{user}/followers?include={include}&offset={offset}&limit={limit}"
-    followers_query = "data%5B*%5D.answer_count%2Carticles_count%2Cgender%2Cfollower_count%2Cis_followed%2Cis_following%2Cbadge%5B%3F(type%3Dbest_answerer)%5D.topics"
+    asks_url = "https://www.zhihu.com/api/v4/members/wmys/questions?include={include}&offset={offset}&limit={limit}"
+    asks_query = "data%5B*%5D.created%2Canswer_count%2Cfollower_count%2Cauthor%2Cadmin_closed_comment"
 
     def start_requests(self):
         '''
         这里重写了start_requests方法，分别请求了用户查询的url和关注列表的查询以及粉丝列表信息查询
         :return:
         '''
-        yield Request(self.user_url.format(user=self.start_user, include=self.user_query), callback=self.parse_user)
-        yield Request(self.follows_url.format(user=self.start_user, include=self.follows_query, offset=0, limit=20),
-                      callback=self.parse_follows)
-        yield Request(self.followers_url.format(user=self.start_user, include=self.followers_query, offset=0, limit=20),
+        yield Request(self.asks_url.format(user=self.start_user, include=self.asks_query, offset=0, limit=2000),
                       callback=self.parse_followers)
 
     def parse_user(self, response):
